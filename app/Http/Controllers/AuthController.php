@@ -51,7 +51,10 @@ class AuthController extends Controller
             'status'=>true,
             'message'=> 'user Login Profile',
             'data'=> $userData,
-            'id'=> auth()->user()->id
+            'id'=> auth()->user()->id,
+            'name'=> auth()->user()->name,
+            'email'=> auth()->user()->email
+
         ],200);
     }
 
@@ -64,4 +67,15 @@ class AuthController extends Controller
             'data'=>[]
         ],200);
     }
+
+    public function show($id)
+    {
+        try {
+            $user = User::findOrFail($id); // Find user by ID; throws ModelNotFoundException if not found
+            return response()->json($user);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'User not found.'], 404);
+        }
+    }
+
 }
