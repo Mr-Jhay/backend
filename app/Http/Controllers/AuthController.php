@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
@@ -51,22 +52,42 @@ class AuthController extends Controller
             'status'=>true,
             'message'=> 'user Login Profile',
             'data'=> $userData,
-            'id'=> auth()->user()->id,
-            'name'=> auth()->user()->name,
-            'email'=> auth()->user()->email
+           // 'id'=> auth()->user()->id,
+           // 'name'=> auth()->user()->name,
+           // 'email'=> auth()->user()->email
 
         ],200);
     }
 
-    public function logout(){
-        auth()->user()->tokens()->delete();
+    public function logout()
+{
+    try {
+        $user = auth()->user();
+
+        if ($user) {
+            $user->tokens()->delete();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Logout successful',
+                'data' => []
+            ], 200);
+        }
 
         return response()->json([
-            'status'=> true,
-            'message'=>'Logout Token',
-            'data'=>[]
-        ],200);
+            'status' => false,
+            'message' => 'Logout failed: User not authenticated',
+            'data' => []
+        ], 401);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Logout failed: ' . $e->getMessage(),
+            'data' => []
+        ], 500);
     }
+}
+
 
     public function show($id)
     {
